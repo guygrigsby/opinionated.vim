@@ -1,7 +1,6 @@
 " Vim indent file
 " Language:    TOML
-" Maintainer:  Guy J Grigsby <guy@grigsby.dev>
-" Created:     2020 April 11
+" Author:  Guy J Grigsby <guy@grigsby.dev>
 " Last Change: 2020 April 11
 "
 if exists("b:did_indent")
@@ -9,13 +8,24 @@ if exists("b:did_indent")
 endif
 let b:did_indent = 1
 
-echo 'LOADED'
+" Only define the function once.
+if exists("*GetOpinionatedTomlIndent")
+  finish
+endif
 
 setlocal autoindent
-setlocal indentexpr=s:GetOpinionatedTomlIndent(v:lnum)
+setlocal indentexpr=GetOpinionatedTomlIndent(v:lnum)
+
+function! s:sumorzero( o, t )
+  let s = o+t
+  if s < 0
+    return 0
+  endif
+  return s
+endfunction
 
 " I know this is gross. I'll fix it.
-function! s:GetOpinionatedTomlIndent( line_num )
+function! GetOpinionatedTomlIndent( line_num )
 
   let nline = a:line_num
   if nline == 0
@@ -30,7 +40,7 @@ function! s:GetOpinionatedTomlIndent( line_num )
     if content =~ '^[ \t]*\[\[.*\]\].*$'
       return ind + sw
     elseif content =~ '^[ \t]*\[.*\].*$'
-      return Sumorzero( ind, -sw )
+      return s:sumorzero( ind, -sw )
     endif
 
     let nline = prevnonblank(nline-1)

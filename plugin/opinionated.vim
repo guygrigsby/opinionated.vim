@@ -8,11 +8,3 @@ if exists("g:loaded_opine")
   finish
 endif
 let g:loaded_opine = 1
-
-function! Sumorzero( o, t )
-  let s = o+t
-  if s < 0
-    return 0
-  endif
-  return s
-endfunction
