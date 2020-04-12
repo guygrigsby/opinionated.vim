@@ -5,7 +5,8 @@
 This is a plugin I extracted for formatting TOML the way I like. You're right, there are no rules, but this is the way I like it. I have been working with Hugo a log and copy/pasta-ing those ocnfig files leaves all the tomls in different states on indent and I can't stand that it would indent on save. 
 
 I use it with [vim-toml](https://github.com/cespare/vim-toml). It formats it the way I like. Ex
-```
+
+```toml
 title = "TOML Example"
 
 [owner]
