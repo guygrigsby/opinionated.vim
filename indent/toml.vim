@@ -24,9 +24,9 @@ function! s:sumorzero( o, t )
   return s
 endfunction
 
+
 " I know this is gross. I'll fix it.
 function! GetOpinionatedTomlIndent( line_num )
-
   let nline = a:line_num
   if nline == 0
     return 0
@@ -37,7 +37,7 @@ function! GetOpinionatedTomlIndent( line_num )
     let ind = indent(nline - 1 )
     let content = getline(nline)
 
-    if content =~ '^[ \t]*\[\[.*\]\].*$'
+    if content =~ '^[ \t]*\[\+\[.*\]\]\+.*$'
       return ind + sw
     elseif content =~ '^[ \t]*\[.*\].*$'
       return s:sumorzero( ind, -sw )
@@ -48,8 +48,8 @@ function! GetOpinionatedTomlIndent( line_num )
 
     if content =~ '^[ \t]*\[.*\].*$'
       return ind + sw
-    endif
 
+    endif
   endwhile
 
   return ind
