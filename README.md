@@ -2,10 +2,11 @@
 
 ## TOML Formatting
 
-This is a plugin I extracted for formatting TOML the way I like. You're right, there are no rules, but this is the way I like it. I have been working with Hugo a log and copy/pasta-ing those ocnfig files leaves all the tomls in different states on indent and I can't stand that it would indent on save. 
+This is a plugin I extracted for formatting TOML the way I like. You're right, there are no rules, but this is the way I like it. I have been working with Hugo a lot and copy/pasta-ing those config files leaves all the tomls in different states of indent and it was bothering me. Everything else I write indents on save. 
 
-I use it with [vim-toml](https://github.com/cespare/vim-toml). It formats it the way I like. Ex
+I use it with [vim-toml](https://github.com/cespare/vim-toml).
 
+### Format example [sample.json](sample.json)
 ```toml
 title = "TOML Example"
 
@@ -41,7 +42,7 @@ title = "TOML Example"
   ]
 ```
 
-It's basically just the `toml.vim` file for the indent. It set setlocal indentexpr
+It's basically just the `toml.vim` file for the indent folder.
 
 ## Usage
 Use Install with your favorite Plugin manager.
