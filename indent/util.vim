@@ -1,15 +1,18 @@
 " Takes a line of TOML and returns the map key and value where map[key]==value}
-function! IsChild( content, nline )
+function! TableName( content )
 
   let pattern = '^[ \t ]*\[\+\(\zs\(.*\.\)\+\ze\(.\+\)\)\].*$'
-  let val = matchstr(a:content, pattern)
+  let name = matchstr(a:content, pattern)
+  return name[0:strlen(name)-2])
+endfunction
 
-  let pcontent = getline(nline-1)
-  val = escape(val, '.')
+function! IsChild( p, c )
 
-  echo val
+  let p = escape(a:p, '.')
+  let c = escape(a:c, '.')
 
-  let m = matchstr(pcontent, val[0:strlen(val)-2])
-  echo m 
-  return m
+  if c ~= p
+    return 1
+  endif
+  return 0
 endfunction

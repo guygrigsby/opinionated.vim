@@ -32,22 +32,25 @@ function! GetOpinionatedTomlIndent( line_num )
     return 0
   endif
   let sw = exists('*shiftwidth') ? shiftwidth() : shiftwidth()
+  let nTablename = TableName( getline(nline) )
+
 
   while nline > 0
-    let ind = indent(nline - 1 )
-    let content = getline(nline)
-
-    if content =~ '^[ \t]*\[\+\[.*\]\]\+.*$'
-      return ind + sw
-    elseif content =~ '^[ \t]*\[.*\].*$'
-      return s:sumorzero( ind, -sw )
-    endif
-
     let nline = prevnonblank(nline-1)
+    let ind = indent(nline)
     let content = getline(nline)
 
-    if content =~ '^[ \t]*\[.*\].*$'
-      return ind + sw
+    " table or array of tables; check parent
+    if content =~ '^[ \t]*\[\+.*\]\+.*$'
+      let parent = TableName( content )
+      let peer = Table
+      if nTableName =~ parent
+        return ind + sw
+      elseif nTable +~ peer 
+        return nid
+      else
+        return s:sumorzero( ind, -sw )
+      endif
 
     endif
   endwhile

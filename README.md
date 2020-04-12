@@ -6,7 +6,8 @@ This is a plugin I extracted for formatting TOML the way I like. You're right, t
 
 I use it with [vim-toml](https://github.com/cespare/vim-toml).
 
-### Format example [sample.json](sample.json)
+### Format Example 
+[Original from toml-lang](https://github.com/toml-lang/toml#example)
 ```toml
 title = "TOML Example"
 
