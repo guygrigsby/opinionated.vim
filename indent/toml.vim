@@ -4,23 +4,24 @@
 " Created:     2020 April 11
 " Last Change: 2020 April 11
 "
-if exists("b:opinionated_indent")
-  echo "Skipping load of TOML indent because did_indent has been set"
+if exists("b:did_indent")
   finish
 endif
-let b:opinionated_indent = 1
+let b:did_indent = 1
 
-setlocal indentexpr=GetOpinionatedTomlIndent(v:lnum)
+echo 'LOADED'
+
+setlocal autoindent
+setlocal indentexpr=s:GetOpinionatedTomlIndent(v:lnum)
 
 " I know this is gross. I'll fix it.
-function! GetOpinionatedTomlIndent( line_num )
+function! s:GetOpinionatedTomlIndent( line_num )
 
   let nline = a:line_num
   if nline == 0
     return 0
   endif
-
-  let sw = 2
+  let sw = exists('*shiftwidth') ? shiftwidth() : shiftwidth()
 
   while nline > 0
     let ind = indent(nline - 1 )
@@ -29,7 +30,7 @@ function! GetOpinionatedTomlIndent( line_num )
     if content =~ '^[ \t]*\[\[.*\]\].*$'
       return ind + sw
     elseif content =~ '^[ \t]*\[.*\].*$'
-      return sumorzero( ind, -sw )
+      return Sumorzero( ind, -sw )
     endif
 
     let nline = prevnonblank(nline-1)
@@ -43,11 +44,4 @@ function! GetOpinionatedTomlIndent( line_num )
 
   return ind
 endfunction
-
-function! s:sumorzero( o, t )
-  let s = o+t
-  if s < 0
-    return 0
-  endif
-  return s
-endfunction
+" vim:set sts=2 sw=2:
