@@ -24,6 +24,17 @@ function! s:sumorzero( o, t )
   return s
 endfunction
 
+function! Tablename( content )
+  "let pattern = '^[ \t ]*\[\+\(\(.*\.\)\+\(.\+\)\)\].*$'
+  "let name = matchstr( content, pattern )
+  echom "Content " . content . " Pattern " . pattern
+  "echom "table name " . name
+  "return name[1:strlen(name)-2]
+  let end = strlen(content)-2
+  echom "end " . end . " end"
+  return content[1:end]
+endfunction
+
 
 " I know this is gross. I'll fix it.
 function! GetOpinionatedTomlIndent( line_num )
@@ -32,29 +43,46 @@ function! GetOpinionatedTomlIndent( line_num )
     return 0
   endif
   let sw = exists('*shiftwidth') ? shiftwidth() : shiftwidth()
-  let nTablename = TableName( getline(nline) )
+  let nTablename = Tablename( getline(nline) )
+  echom "this line table name " . nTablename
+  let nline = prevnonblank(nline-1)
+  let ind = indent(nline)
+  let content = getline(nline)
 
+  " table or array of tables; check parent
+  if content =~ '^[ \t]*\[\+.*\]\+.*$'
+    if !nTableName
+      return ind + sw
+    endif
+    let parent = Tablename( content )
+    if !parent 
+      return ind
+    endif
 
-  while nline > 0
-    let nline = prevnonblank(nline-1)
-    let ind = indent(nline)
-    let content = getline(nline)
+    if stridx(nTableName, parent) >= 0
+      return ind + sw
+    endif
 
-    " table or array of tables; check parent
-    if content =~ '^[ \t]*\[\+.*\]\+.*$'
-      let parent = TableName( content )
-      let peer = Table
-      if nTableName =~ parent
-        return ind + sw
-      elseif nTable +~ peer 
-        return nid
-      else
+    let prev_names = split(parent, ".")
+    let new_names = split(nTableName, ".")
+    let deb = "comparing " . parent . " to " . nTableName
+    echom deb
+    if strlen(prev_names) != strlen(new_names)
+      return s:sumorzero( ind, -sw )
+    endif
+
+    let i = 0
+    while i < strlen(prev_names)-1
+      let deb = "comparing " . prev_names[i] . " to " . new_names[i]
+      echom deb
+      if prev_names[i] != new_names[i]
         return s:sumorzero( ind, -sw )
       endif
+      let i += 1
+    endwhile
+  endif
 
-    endif
-  endwhile
-
+  echom "returning ind"
   return ind
 endfunction
 " vim:set sts=2 sw=2:
