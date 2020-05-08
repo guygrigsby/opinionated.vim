@@ -45,16 +45,16 @@ function! GetOpinionatedTomlIndent( line_num )
   let sw = exists('*shiftwidth') ? shiftwidth() : shiftwidth()
   let nTablename = Tablename( getline(nline) )
   echom "this line table name " . nTablename
-  let nline = prevnonblank(nline-1)
-  let ind = indent(nline)
-  let content = getline(nline)
+  let pline = prevnonblank(nline-1)
+  let ind = indent(pline)
+  let pcontent = getline(pline)
 
   " table or array of tables; check parent
-  if content =~ '^[ \t]*\[\+.*\]\+.*$'
+  if pcontent =~ '^[ \t]*\[\+.*\]\+.*$'
     if !nTableName
       return ind + sw
     endif
-    let parent = Tablename( content )
+    let parent = Tablename( pcontent )
     if !parent 
       return ind
     endif
