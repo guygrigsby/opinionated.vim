@@ -8,3 +8,7 @@ if exists("g:loaded_opine")
   finish
 endif
 let g:loaded_opine = 1
+augroup vim-opine
+  autocmd!
+  " do a thing?
+augroup end

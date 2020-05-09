@@ -24,65 +24,99 @@ function! s:sumorzero( o, t )
   return s
 endfunction
 
-function! Tablename( content )
-  "let pattern = '^[ \t ]*\[\+\(\(.*\.\)\+\(.\+\)\)\].*$'
-  "let name = matchstr( content, pattern )
-  echom "Content " . content . " Pattern " . pattern
-  "echom "table name " . name
-  "return name[1:strlen(name)-2]
-  let end = strlen(content)-2
-  echom "end " . end . " end"
-  return content[1:end]
-endfunction
-
-
 " I know this is gross. I'll fix it.
 function! GetOpinionatedTomlIndent( line_num )
-  let nline = a:line_num
-  if nline == 0
+  if a:line_num == 0
+    call echom printf("first line")
     return 0
   endif
-  let sw = exists('*shiftwidth') ? shiftwidth() : shiftwidth()
-  let nTablename = Tablename( getline(nline) )
-  echom "this line table name " . nTablename
-  let pline = prevnonblank(nline-1)
-  let ind = indent(pline)
-  let pcontent = getline(pline)
 
-  " table or array of tables; check parent
-  if pcontent =~ '^[ \t]*\[\+.*\]\+.*$'
-    if !nTableName
-      return ind + sw
-    endif
-    let parent = Tablename( pcontent )
-    if !parent 
-      return ind
-    endif
-
-    if stridx(nTableName, parent) >= 0
-      return ind + sw
-    endif
-
-    let prev_names = split(parent, ".")
-    let new_names = split(nTableName, ".")
-    let deb = "comparing " . parent . " to " . nTableName
-    echom deb
-    if strlen(prev_names) != strlen(new_names)
-      return s:sumorzero( ind, -sw )
-    endif
-
-    let i = 0
-    while i < strlen(prev_names)-1
-      let deb = "comparing " . prev_names[i] . " to " . new_names[i]
-      echom deb
-      if prev_names[i] != new_names[i]
-        return s:sumorzero( ind, -sw )
-      endif
-      let i += 1
-    endwhile
+  let index = a:line_num
+  if !Tablename( getline(index) )
+    call echom printf("(%s) not a table using indent", getline(index))
+    return indent(index)
   endif
 
-  echom "returning ind"
+  let sw = exists('*shiftwidth') ? shiftwidth() : shiftwidth()
+
+  while index > 0
+    echom "this line table name " . nTablename
+    let pline = prevnonblank(index)
+    let ind = indent(pline)
+
+    " table or array of tables; check parent
+    let ptable = matchstr(getline(pline), '^[ \t]*\[\+.*\]\+.*$')
+
+    if !ptable
+      call echom printf("NO line match %s on line %d", ptable, index)
+      continue
+    endif
+    call echom printf("line match %s on line %d", ptable, index)
+
+    let parent = Tablename( ptable )
+    if !parent 
+      call echom printf("NO table %s on line %d", parent, index)
+      continue
+    endif
+    call echom printf("table %s on line %d", parent, index)
+
+    if IsChild(parent, nTablename)
+      call echom printf("is child table %s on line %d", nTablename, index)
+      return ind + sw
+    endif
+
+    call echom printf("NO child table %s on line %d", nTablename, index)
+
+    if IsChild(nTablename, parent)
+      call echom printf("reverse is child table %s on line %d", parent, index)
+      return s:sumorzero( ind, -sw )
+    endif
+    let index = pline
+  endwhile
+
+  call echom printf("END returning last ind")
   return ind
 endfunction
-" vim:set sts=2 sw=2:
+
+" Takes a line of TOML and returns the map key and value where map[key]==value}
+function! TableName( content )
+
+  let pattern = '^[ \t ]*\[\+\(\zs\(.*\.\)\+\ze\(.\+\)\)\].*$'
+  let name = matchstr(a:content, pattern)
+  if name == ""
+    return ""
+  endif
+  let e = strlen(name)-2
+  return name[0:e]
+endfunction
+echom "sourced toml.vim"
+" if p is a namespace parent of c returns true, else false
+function! IsChild( p, c )
+  echom printf("comparing parent %s to child %s", a:p, a:c)
+
+  let p_list = split(a:p, "\\.")
+  let c_list = split(a:c, "\\.")
+  echo printf("p_list %s c_list %s", p_list, c_list)
+
+  if len(p_list) >= len(c_list)
+    echom "child is larger or equal"
+    return 0
+  endif
+
+  " range over both and if the parent is fully contained in the child, yes
+  let index = 0
+  while index < len(p_list)-2 "skip the last
+
+    let psec = p_list[index]
+    let csec = c_list[index]
+    echom printf("psec %s csec %s", psec, csec)
+    if csec != psec
+      return 0
+    endif
+
+    let index += 1
+
+  endwhile
+  return 1
+endfunction
+" vim: sw=2 ts=2 et
